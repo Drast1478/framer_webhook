@@ -42,13 +42,21 @@ EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Loaded securely from Render
 @app.route('/contact', methods=['POST'])
 def receive_form():
     try:
-        # ✅ Get form data
+        # ✅ Print raw request data for debugging
         data = request.json if request.is_json else request.form.to_dict()
-        name = data.get("name", "Unknown")
-        email = data.get("email", "No email provided")
-        message = data.get("message", "No message")
+        print(f"📩 Raw data received from Framer: {data}")
 
-        print(f"📩 Received new inquiry: {name}, {email}, {message}")
+        name = data.get("name", "").strip()
+        email = data.get("email", "").strip()
+        message = data.get("message", "").strip()
+
+        print(f"📩 Processed data: Name={name}, Email={email}, Message={message}")
+
+        # ✅ Check if email is valid before sending
+        if not email or "@" not in email:
+            print(f"❌ Invalid email address: {email}. Skipping email send.")
+        else:
+            send_email(email, name)
 
         # ✅ Save to Google Sheets
         try:
@@ -56,9 +64,6 @@ def receive_form():
             print("✅ Successfully saved to Google Sheets!")
         except Exception as e:
             print(f"❌ Google Sheets Error: {e}")
-
-        # ✅ Send Thank You Email
-        send_email(email, name)
 
         return jsonify({"status": "received", "message": "Thank you for reaching out!"}), 200
 
@@ -68,7 +73,7 @@ def receive_form():
 
 def send_email(to_email, name):
     try:
-        print(f"📧 Sending email to {to_email}...")
+        print(f"📧 Attempting to send email to {to_email}...")
 
         msg = MIMEMultipart()
         msg["From"] = EMAIL_USERNAME

@@ -42,21 +42,16 @@ EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Loaded securely from Render
 @app.route('/contact', methods=['POST'])
 def receive_form():
     try:
-        # ✅ Print raw request data for debugging
+        # ✅ Print the full raw request for debugging
         data = request.json if request.is_json else request.form.to_dict()
-        print(f"📩 Raw data received from Framer: {data}")
+        print(f"📩 Full raw data from Framer: {data}")
 
-        name = data.get("name", "").strip()
-        email = data.get("email", "").strip()
-        message = data.get("message", "").strip()
+        # ✅ Extract form values properly
+        name = data.get("name", "Unknown").strip()
+        email = data.get("email", "No email provided").strip()
+        message = data.get("message", "No message").strip()
 
         print(f"📩 Processed data: Name={name}, Email={email}, Message={message}")
-
-        # ✅ Check if email is valid before sending
-        if not email or "@" not in email:
-            print(f"❌ Invalid email address: {email}. Skipping email send.")
-        else:
-            send_email(email, name)
 
         # ✅ Save to Google Sheets
         try:
@@ -64,6 +59,10 @@ def receive_form():
             print("✅ Successfully saved to Google Sheets!")
         except Exception as e:
             print(f"❌ Google Sheets Error: {e}")
+
+        # ✅ Send Email (Only if Email is Valid)
+        if "@" in email:
+            send_email(email, name)
 
         return jsonify({"status": "received", "message": "Thank you for reaching out!"}), 200
 

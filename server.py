@@ -39,7 +39,7 @@ EMAIL_PORT = 587  # Secure SMTP port
 EMAIL_USERNAME = "mihaibuzila1478@gmail.com"  # Replace with your Gmail address
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Loaded securely from Render
 
-@app.route('/contact', methods=['POST'])
+@@app.route('/contact', methods=['POST'])
 def receive_form():
     try:
         # ✅ Print the raw data for debugging

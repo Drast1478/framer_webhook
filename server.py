@@ -42,14 +42,14 @@ EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Loaded securely from Render
 @app.route('/contact', methods=['POST'])
 def receive_form():
     try:
-        # ✅ Print the full raw request for debugging
+        # ✅ Print the raw data for debugging
         data = request.json if request.is_json else request.form.to_dict()
         print(f"📩 Full raw data from Framer: {data}")
 
-        # ✅ Extract form values properly
-        name = data.get("name", "Unknown").strip()
-        email = data.get("email", "No email provided").strip()
-        message = data.get("message", "No message").strip()
+        # ✅ Normalize key names (Fixes Framer capitalized keys)
+        name = data.get("name") or data.get("Name", "Unknown")
+        email = data.get("email") or data.get("Email", "No email provided")
+        message = data.get("message") or data.get("Message", "No message")
 
         print(f"📩 Processed data: Name={name}, Email={email}, Message={message}")
 

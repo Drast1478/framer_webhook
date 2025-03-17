@@ -101,5 +101,8 @@ def send_email(to_email, name):
     except Exception as e:
         print(f"❌ Email Sending Error: {e}")
 
+import os
+
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Render assigns a dynamic port
+    app.run(host="0.0.0.0", port=port, debug=True)

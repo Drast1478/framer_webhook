@@ -88,7 +88,7 @@ def send_email(to_email, sender_name):
                 I’ll get back to you as soon as I can (usually pretty quick).
             </p>
             <p style="font-size: 16px; margin-top: 30px;">
-                Until then, stay awesome!<br><br>
+                Until then, stay happy!<br><br>
                 <strong>- Mihai from BMihai Studio</strong>
             </p>
             <hr style="margin: 40px auto; width: 60%; border: none; border-top: 1px solid #ddd;">

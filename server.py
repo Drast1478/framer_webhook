@@ -34,8 +34,8 @@ except Exception as e:
     print(f"❌ Google Sheets authentication error: {e}")
 
 # ✅ Email Configuration (Using Gmail SMTP & App Password)
-EMAIL_HOST = "smtp.gmail.com"  # Gmail SMTP server
-EMAIL_PORT = 587  # Secure SMTP port
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
 EMAIL_USERNAME = "mihaibuzila1478@gmail.com"  # Replace with your Gmail address
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Loaded securely from Render
 
@@ -47,7 +47,7 @@ def receive_form():
         print(f"📩 Full raw data from Framer: {data}")
 
         # ✅ Normalize key names (Fixes Framer capitalized keys)
-        name = data.get("name") or data.get("Name", "Unknown")
+        name = data.get("name") or data.get("Name", "there")
         email = data.get("email") or data.get("Email", "No email provided")
         message = data.get("message") or data.get("Message", "No message")
 
@@ -70,7 +70,7 @@ def receive_form():
         print(f"❌ General Error: {e}")
         return jsonify({"error": str(e)}), 500
 
-def send_email(to_email, name):
+def send_email(to_email, sender_name):
     try:
         print(f"📧 Attempting to send email to {to_email}...")
 
@@ -80,12 +80,14 @@ def send_email(to_email, name):
         msg["Subject"] = "Thank You for Reaching Out!"
         
         body = f"""
-        Hi {name},
+        Hey {sender_name},
 
-        Thank you for contacting me! I received your message and will get back to you as soon as possible.
+        I just got your message — thank you for reaching out!
+        I’ll get back to you as soon as I can (usually pretty quick).
 
-        Best,
-        Mihai
+        Until then, stay awesome!
+
+        - Mihai from BMihai Studio
         """
         msg.attach(MIMEText(body, "plain"))
 
@@ -100,8 +102,6 @@ def send_email(to_email, name):
 
     except Exception as e:
         print(f"❌ Email Sending Error: {e}")
-
-import os
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Render assigns a dynamic port

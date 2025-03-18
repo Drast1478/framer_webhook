@@ -74,22 +74,30 @@ def send_email(to_email, sender_name):
     try:
         print(f"📧 Attempting to send email to {to_email}...")
 
-        msg = MIMEMultipart()
+        msg = MIMEMultipart("alternative")
         msg["From"] = EMAIL_USERNAME
         msg["To"] = to_email
         msg["Subject"] = "Thank You for Reaching Out!"
-        
-        body = f"""
-        Hey {sender_name},
 
-        I just got your message — thank you for reaching out!
-        I’ll get back to you as soon as I can (usually pretty quick).
-
-        Until then, stay awesome!
-
-        - Mihai from BMihai Studio
+        html_body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; text-align: center; padding: 20px; color: #333;">
+            <h2 style="color: #222;">Hey {sender_name},</h2>
+            <p style="font-size: 16px; line-height: 1.5;">
+                I just got your message — thank you for reaching out!<br>
+                I’ll get back to you as soon as I can (usually pretty quick).
+            </p>
+            <p style="font-size: 16px; margin-top: 30px;">
+                Until then, stay awesome!<br><br>
+                <strong>- Mihai from BMihai Studio</strong>
+            </p>
+            <hr style="margin: 40px auto; width: 60%; border: none; border-top: 1px solid #ddd;">
+            <p style="font-size: 12px; color: #888;">This is an automated message — no need to reply.</p>
+        </body>
+        </html>
         """
-        msg.attach(MIMEText(body, "plain"))
+
+        msg.attach(MIMEText(html_body, "html"))
 
         # ✅ Connect to SMTP server and send email
         server = smtplib.SMTP(EMAIL_HOST, EMAIL_PORT)
@@ -98,7 +106,7 @@ def send_email(to_email, sender_name):
         server.sendmail(EMAIL_USERNAME, to_email, msg.as_string())
         server.quit()
 
-        print("✅ Email sent successfully!")
+        print("✅ HTML Email sent successfully!")
 
     except Exception as e:
         print(f"❌ Email Sending Error: {e}")

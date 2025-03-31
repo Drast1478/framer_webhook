@@ -12,10 +12,9 @@ app = Flask(__name__)
 # ✅ Load Google Sheets credentials from Render Environment Variables
 try:
     GOOGLE_CREDENTIALS = os.getenv("GOOGLE_CREDENTIALS")
-    SHEET_ID = os.getenv("GOOGLE_SHEET_ID")  # 🔐 Sheet ID from environment
 
-    if GOOGLE_CREDENTIALS is None or SHEET_ID is None:
-        raise ValueError("Missing required environment variables!")
+    if GOOGLE_CREDENTIALS is None:
+        raise ValueError("GOOGLE_CREDENTIALS is missing from environment variables!")
 
     creds_json = json.loads(GOOGLE_CREDENTIALS)
     print("✅ Successfully loaded Google Sheets credentials!")
@@ -26,7 +25,9 @@ try:
     client = gspread.authorize(creds)
 
     # Open the Google Sheet
+    SHEET_ID = "1QHGT75HnTiqjjdK0SImS9kx_rim3Di-gNKPhBAEFfVo"
     sheet = client.open_by_key(SHEET_ID).sheet1
+
     print("✅ Successfully connected to Google Sheets!")
 
 except Exception as e:
@@ -35,8 +36,8 @@ except Exception as e:
 # ✅ Email Configuration (Using Gmail SMTP & App Password)
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
-EMAIL_USERNAME = "mihaibuzila1478@gmail.com"  # Replace with your Gmail
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # From Render env variables
+EMAIL_USERNAME = "mihaibuzila1478@gmail.com"
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
 @app.route('/contact', methods=['POST'])
 def receive_form():
@@ -44,29 +45,28 @@ def receive_form():
         data = request.json if request.is_json else request.form.to_dict()
         print(f"📩 Full raw data from Framer: {data}")
 
-        # ✅ Normalize & handle missing values
+        # Normalize input with fallback defaults
         name = data.get("name") or data.get("Name", "there")
         email = data.get("email") or data.get("Email", "No email provided")
         phone = data.get("phone") or data.get("Phone", "")
-        location = data.get("location") or data.get("Location", "")
         date = data.get("date") or data.get("Date", "")
-        service = data.get("service") or data.get("We're doing...?", "Not specified")
+        service = data.get("service") or data.get("Service", "")
         message = data.get("message") or data.get("Message", "No message")
 
-        print(f"📩 Processed: {name}, {email}, {phone}, {location}, {date}, {service}, {message}")
+        print(f"📩 Processed data:\nName={name}, Email={email}, Phone={phone}, Date={date}, Service={service}, Message={message}")
 
-        # ✅ Save to Google Sheets
+        # Append to Google Sheet
         try:
-            sheet.append_row([name, email, phone, location, date, service, message])
-            print("✅ Data saved to Google Sheets!")
+            sheet.append_row([name, email, phone, date, service, message])
+            print("✅ Successfully saved to Google Sheets!")
         except Exception as e:
             print(f"❌ Google Sheets Error: {e}")
 
-        # ✅ Send email only if valid
+        # Send email if email is valid
         if "@" in email:
             send_email(email, name)
 
-        return jsonify({"status": "received", "message": "Thanks for reaching out!"}), 200
+        return jsonify({"status": "received", "message": "Thank you for reaching out!"}), 200
 
     except Exception as e:
         print(f"❌ General Error: {e}")
@@ -74,7 +74,7 @@ def receive_form():
 
 def send_email(to_email, sender_name):
     try:
-        print(f"📧 Sending email to {to_email}...")
+        print(f"📧 Attempting to send email to {to_email}...")
 
         msg = MIMEMultipart("alternative")
         msg["From"] = EMAIL_USERNAME
@@ -107,11 +107,11 @@ def send_email(to_email, sender_name):
         server.sendmail(EMAIL_USERNAME, to_email, msg.as_string())
         server.quit()
 
-        print("✅ Email sent successfully!")
+        print("✅ HTML Email sent successfully!")
 
     except Exception as e:
         print(f"❌ Email Sending Error: {e}")
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Render assigns dynamic port
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)

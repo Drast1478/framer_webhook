@@ -86,7 +86,7 @@ def send_email(to_email, sender_name):
         <body style="font-family: Arial, sans-serif; text-align: center; padding: 20px; color: #333;">
             <h2 style="color: #222;">Hey {sender_name},</h2>
             <p style="font-size: 16px; line-height: 1.5;">
-                I just got your message — thank you for reaching out!<br>
+                I LOVE YOU, Michael!<br>
                 I’ll get back to you as soon as I can (usually pretty quick).
             </p>
             <p style="font-size: 16px; margin-top: 30px;">
